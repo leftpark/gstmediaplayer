@@ -9,8 +9,8 @@
 
 #include "player.h"
 
-#define TRUE 1
-#define FALSE 0
+//#define TRUE 1
+//#define FALSE 0
 #define DBUG 1
 
 const char*
