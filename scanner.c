@@ -9,8 +9,6 @@
 
 #include "player.h"
 
-//#define TRUE 1
-//#define FALSE 0
 #define DBUG 1
 
 const char*
@@ -43,18 +41,16 @@ getPath(int argc, char **argv) {
 int
 processFile(const char *path)
 {
-    if (strstr(path, ".mp3")) {
-        // TODO
-        play(path);
-    } else if (strstr(path, ".wav")) {
-        // TODO
-    }
+    printf("processFile(S)\n");
+    play(path);
+    printf("processFile(X)\n");
     return TRUE;
 }
 
 int
 processDirectory(const char *path)
 {
+    printf("processDirectory(S)\n");
     if (DBUG) {
         printf("[D]path = [%s]\n", path);
     }
@@ -101,7 +97,7 @@ processDirectory(const char *path)
             }
             else
             {
-                    printf("stat() failed for %s: %s\n", path, strerror(errno));
+                printf("stat() failed for %s: %s\n", path, strerror(errno));
             }
         }
         if (name[0] == '.') {
@@ -110,9 +106,11 @@ processDirectory(const char *path)
 
         char filename[PATH_MAX];
         snprintf(filename, PATH_MAX, "%s/%s", path, name);
+        printf("path = %s, filename = %s\n", path, filename);
         if (type == DT_DIR) {   // Directory type
             if (!processDirectory(filename)) {
                 closedir(dir);
+                printf("processDirectory(X)\n");
                 return -1;
             }
         } else if (type == DT_REG) {    // File type
@@ -122,9 +120,10 @@ processDirectory(const char *path)
             }
         }
     }
-    closedir(dir);
 
-    return 0;
+    closedir(dir);
+    printf("processDirectory(X)\n");
+    return 1;
 }
 
 void scan(const char *path){
