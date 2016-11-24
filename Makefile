@@ -6,5 +6,9 @@ TARGET = gstmediaplayer
 gstmediaplayer: main.c player.c scanner.c
 	$(CC) $(CFLAGS) main.c player.c scanner.c -o $(TARGET) $(LIBS) 
 
+AR = ar
+libs: player.o scanner.o
+	$(AR) rcs libjypark.a scanner.o player.o
+
 clean:
-	rm $(TARGET)
+	rm $(TARGET) *.o *.a
