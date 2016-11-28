@@ -14,7 +14,9 @@ registerDiscoverer()
 static void
 handleCompleteEvent(gstData *data)
 {
-    g_print(" [handleCompleteEvent]\n");
+    if (DBUG) {
+        g_print(" [handleCompleteEvent]\n");
+    }
     stop_playback_pipe(data);
     return;
 }
@@ -25,17 +27,21 @@ handlePlaybinEvent(GstBus *bus, GstMessage *message, gpointer data)
     GstObject *src = GST_MESSAGE_SRC(message);
     GMainLoop *loop = data;
 
-    g_print(" [handlePlaybinEvent] : %s\n", gst_object_get_name(src));
+    if (DBUG) {
+        g_print(" [handlePlaybinEvent] : %s\n", gst_object_get_name(src));
+    }
 
     if (src != (GstObject *)gdata.pipeline)
     {
         return TRUE;
     }
 
-    g_print(" [handlePlaybinEvent] : bus(%p), name(%s), msg(%s)\n",
+    if (DBUG) {
+        g_print(" [handlePlaybinEvent] : bus(%p), name(%s), msg(%s)\n",
             bus,
             gst_object_get_name(src),
             GST_MESSAGE_TYPE_NAME(message));
+    }
 
     switch(GST_MESSAGE_TYPE(message))
     {
@@ -122,7 +128,9 @@ init_audio_playback_pipeline(gstData *data)
     }
 
     if (strstr(data->filelocation, ".wav")) {
-        g_print("WAV Audio decoder selected.\n");
+        if (DBUG) {
+            g_print("WAV Audio decoder selected.\n");
+        }
         data->decoder_element = gst_element_factory_make("wavparse", "wavdecoer");
     }
 
@@ -177,7 +185,9 @@ init_audio_playback_pipeline(gstData *data)
 
         g_signal_connect(data->decoder_element, "pad-added", G_CALLBACK(on_pad_added), data->sink_element);
     }
-    g_print("Done to link src to sink element.\n");
+    if (DBUG) {
+        g_print("Done to link src to sink element.\n");
+    }
 
     return TRUE;
         
@@ -192,10 +202,13 @@ start_playback_pipe(gstData *data)
     /* Creating a bus */
     data->bus = gst_pipeline_get_bus(GST_PIPELINE(data->pipeline));
     gst_bus_add_watch(data->bus, handlePlaybinEvent, data->loop);
-    g_print("Done to create a bus\n");
+    if (DBUG) {
+        g_print("Done to create a bus\n");
+    }
 
     /* Start playing */
     gst_element_set_state (GST_ELEMENT(data->pipeline), GST_STATE_PLAYING);
+    g_print("PLAYING...\n");
     g_main_loop_run(data->loop);
     //state = gst_element_get_state(data->pipeline, NULL, NULL, GST_CLOCK_TIME_NONE);
     //g_print("Start state = %d\n", state);
@@ -205,7 +218,9 @@ start_playback_pipe(gstData *data)
 static void
 stop_playback_pipe(gstData *data)
 {
-    g_print("Stop playback\n");
+    if (DBUG) {
+        g_print("Stop playback\n");
+    }
 
     /* Stop playing */
     gst_element_set_state (GST_ELEMENT(data->pipeline), GST_STATE_NULL);
@@ -231,7 +246,7 @@ delete_pipeline(gstData *data)
 
 void play(const char *path)
 {
-    g_print("play()\n");
+    g_print("play(%s)\n",path);
 
     gst_init(NULL, NULL);
 
@@ -247,10 +262,20 @@ void play(const char *path)
             // TODO
         }
         if (start_playback_pipe(&gdata)) {
-            // TODO 
+            // TODO
         }
     }
 
+    delete_pipeline(&gdata);
+
+    return;
+}
+
+void stop()
+{
+    g_print("Stop()\n");
+
+    stop_playback_pipe(&gdata);
     delete_pipeline(&gdata);
 
     return;

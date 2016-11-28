@@ -53,3 +53,4 @@ static gboolean start_playback_pipe(gstData *data);
 static void stop_playback_pipe(gstData *data);
 static void delete_pipeline(gstData *data);
 void play(const char *path);
+void stop();
